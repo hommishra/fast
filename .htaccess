@@ -1,0 +1,34 @@
+# ==============================================================================
+# FAST COVERAGES – GLOBAL NEWS NETWORK
+# Production GoDaddy & Apache Configuration (.htaccess)
+# ==============================================================================
+
+# Ensure all requests are granted access (Bypasses accidental cPanel directory restrictions)
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# Prevent ModSecurity or Apache from throwing 403 on social media user agents
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD"
+    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+</IfModule>
+
+# Enable Rewrite Engine for clean SPA routing under Apache if serving directly
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Allow Instagram, Facebook, Meta, and WhatsApp crawlers/in-app browsers
+    RewriteCond %{HTTP_USER_AGENT} (Instagram|facebookexternalhit|Facebot|Meta|WhatsApp) [NC]
+    RewriteRule .* - [E=ALLOW_SOCIAL_BOT:1]
+
+    # Standard clean routing fallback (directs traffic to Node.js / Passenger)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ server.js [L]
+</IfModule>
+
+# Prevent directory listing for enhanced security
+Options -Indexes
