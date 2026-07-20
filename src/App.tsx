@@ -14,6 +14,7 @@ import NewsTicker from './components/NewsTicker';
 import AdBanner from './components/AdBanner';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
+import SpecialPages from './components/SpecialPages';
 
 // Icons
 import { 
@@ -467,6 +468,26 @@ export default function App() {
               </div>
             </div>
           </div>
+        ) : [
+          'about-us', 'contact-us', 'advertise-with-us', 'careers',
+          'privacy-policy', 'terms-and-conditions', 'disclaimer',
+          'live-news', 'video-news', 'photo-gallery'
+        ].includes(currentPage) ? (
+          /* ================== DYNAMIC CORPORATE & SPECIAL DECK PAGES ================== */
+          <SpecialPages
+            page={currentPage}
+            articles={articles}
+            careers={careers}
+            users={users}
+            settings={settings}
+            adSlots={adSlots}
+            onNavigate={(page) => {
+              setCurrentPage(page);
+              setSelectedArticle(null);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onViewArticle={handleViewArticle}
+          />
         ) : (
           /* ================== STANDARD HOME & ROUTE FEEDS ================== */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -647,62 +668,6 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
-
-      {/* ================== EXTRA LEGAL & DIRECTORY PAGES RENDERING OVERLAYS ================== */}
-      {currentPage === 'careers' && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto font-sans">
-          <div className="bg-white dark:bg-slate-950 p-6 rounded-xl max-w-2xl w-full border border-slate-250 dark:border-slate-800">
-            <h2 className="text-lg font-black uppercase text-slate-950 dark:text-white mb-2">Fast Coverages Careers Desk</h2>
-            <p className="text-xs text-slate-500 mb-4">Join an independent news reporting infrastructure built for light speed delivery indices.</p>
-            <div className="flex flex-col gap-4">
-              {careers.map(c => (
-                <div key={c.id} className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 rounded">
-                  <span className="text-[10px] bg-red-100 dark:bg-red-950 text-red-600 font-bold px-2 py-0.5 rounded font-mono uppercase">{c.type}</span>
-                  <h4 className="text-sm font-black text-slate-900 dark:text-white mt-1">{c.title}</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{c.department} • {c.location}</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">{c.description}</p>
-                  <ul className="list-disc pl-4 text-[11px] text-slate-500 dark:text-slate-400 mt-2 space-y-1">
-                    {c.requirements.map((req, rIdx) => <li key={rIdx}>{req}</li>)}
-                  </ul>
-                </div>
-              ))}
-            </div>
-            <button 
-              onClick={() => setCurrentPage('home')}
-              className="bg-slate-950 hover:bg-slate-800 text-white font-bold py-2 px-5 rounded text-xs uppercase tracking-wider mt-5 w-full transition"
-            >
-              Back to Home
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* LEGAL DISCLOSURES & DISCLAIMERS OVERLAYS */}
-      {(currentPage === 'privacy-policy' || currentPage === 'terms-and-conditions' || currentPage === 'disclaimer') && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto font-sans">
-          <div className="bg-white dark:bg-slate-950 p-6 rounded-xl max-w-xl w-full border border-slate-250 dark:border-slate-800">
-            <h2 className="text-base font-black uppercase text-slate-950 dark:text-white mb-2">{currentPage.replace('-', ' ')}</h2>
-            <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed space-y-3 font-serif max-h-[60vh] overflow-y-auto pr-2">
-              <p className="font-bold">Last Updated: July 20, 2026</p>
-              <p>
-                FAST COVERAGES is committed to maintaining high standard editorial metrics under public trust guidelines. All information published on this web app is vetted, structured, and presented with maximum accuracy.
-              </p>
-              <p>
-                This website is fully configured to compile to static and lightweight HTML files inside the <code className="font-mono bg-slate-100 dark:bg-slate-900 px-1 py-0.5 rounded text-red-500">dist/</code> directory, perfectly compliant with cPanel, GoDaddy Cloud, or standard AWS storage buckets with zero routing failures.
-              </p>
-              <p>
-                No cookie tracking is utilized for malicious profiling. Advertisements displayed inside commercial containers may utilize basic geolocation to customize relevant banners under GoDaddy AdSense policies.
-              </p>
-            </div>
-            <button 
-              onClick={() => setCurrentPage('home')}
-              className="bg-slate-950 hover:bg-slate-800 text-white font-bold py-2 px-5 rounded text-xs uppercase tracking-wider mt-5 w-full transition"
-            >
-              Understand & Accept
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 6. Active Admin Panel Launcher Overlay */}
       {isAdminOpen && (
