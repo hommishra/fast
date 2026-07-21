@@ -30,12 +30,49 @@ export const initialCategories: Category[] = [
 
 export const initialUsers: User[] = [
   {
+    id: 'u-owner',
+    name: 'Website Owner',
+    email: 'owner@fastcoverages.com',
+    role: 'Website Owner',
+    phone: '+1 (212) 555-0100',
+    designation: 'Chief Executive & Founder',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    status: 'Active',
+    permissions: {
+      fullWebsiteControl: true,
+      partialWebsiteControl: true,
+      articleManagement: true,
+      advertisementManagement: true,
+      videoManagement: true,
+      breakingNewsManagement: true,
+      seoManagement: true,
+      userManagement: true,
+      homepageManagement: true,
+      socialMediaManagement: true,
+    },
+    bio: 'Founder and Website Owner of FAST COVERAGES – GLOBAL NEWS NETWORK. Holds absolute authority over platform architecture, permissions, database, and security.'
+  },
+  {
     id: 'u-1',
     name: 'Sarah Jenkins',
     email: 'sarah.j@fastcoverages.com',
     role: 'Super Admin',
+    phone: '+1 (212) 555-0101',
+    designation: 'Executive Managing Director',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
     status: 'Active',
+    permissions: {
+      fullWebsiteControl: false,
+      partialWebsiteControl: true,
+      articleManagement: true,
+      advertisementManagement: true,
+      videoManagement: true,
+      breakingNewsManagement: true,
+      seoManagement: true,
+      userManagement: true,
+      homepageManagement: true,
+      socialMediaManagement: true,
+    },
     bio: 'Chief Executive Editor at FAST COVERAGES. Formerly with Reuters and BBC World Service. Award-winning foreign correspondent.'
   },
   {
@@ -43,8 +80,22 @@ export const initialUsers: User[] = [
     name: 'Rajesh Sharma',
     email: 'rajesh.s@fastcoverages.com',
     role: 'Editor',
+    phone: '+91 98100 55432',
+    designation: 'Senior Desk Editor - South Asia',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
     status: 'Active',
+    permissions: {
+      fullWebsiteControl: false,
+      partialWebsiteControl: false,
+      articleManagement: true,
+      advertisementManagement: false,
+      videoManagement: true,
+      breakingNewsManagement: true,
+      seoManagement: true,
+      userManagement: false,
+      homepageManagement: true,
+      socialMediaManagement: false,
+    },
     bio: 'Managing Editor for South Asia. Covering political shifts, economic developments, and environmental policies.'
   },
   {
@@ -52,8 +103,22 @@ export const initialUsers: User[] = [
     name: 'Marcus Vance',
     email: 'marcus.v@fastcoverages.com',
     role: 'Journalist',
+    phone: '+1 (415) 555-0192',
+    designation: 'Senior Technology Correspondent',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
     status: 'Active',
+    permissions: {
+      fullWebsiteControl: false,
+      partialWebsiteControl: false,
+      articleManagement: true,
+      advertisementManagement: false,
+      videoManagement: true,
+      breakingNewsManagement: false,
+      seoManagement: false,
+      userManagement: false,
+      homepageManagement: false,
+      socialMediaManagement: false,
+    },
     bio: 'Senior Technology Correspondent. Based in San Francisco, covering Silicon Valley, AI innovation, and space-tech ventures.'
   },
   {
@@ -61,8 +126,22 @@ export const initialUsers: User[] = [
     name: 'Elena Rostova',
     email: 'elena.r@fastcoverages.com',
     role: 'Journalist',
+    phone: '+44 20 7946 0912',
+    designation: 'Investigative News Reporter',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
     status: 'Active',
+    permissions: {
+      fullWebsiteControl: false,
+      partialWebsiteControl: false,
+      articleManagement: true,
+      advertisementManagement: false,
+      videoManagement: true,
+      breakingNewsManagement: false,
+      seoManagement: false,
+      userManagement: false,
+      homepageManagement: false,
+      socialMediaManagement: false,
+    },
     bio: 'International Security and Investigative Journalist. Expert on East-European affairs and geopolitics.'
   },
   {
@@ -70,8 +149,22 @@ export const initialUsers: User[] = [
     name: 'Amara Diop',
     email: 'amara.d@fastcoverages.com',
     role: 'Moderator',
+    phone: '+33 1 42 68 55 00',
+    designation: 'Community & Comment Moderator',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=200',
     status: 'Active',
+    permissions: {
+      fullWebsiteControl: false,
+      partialWebsiteControl: false,
+      articleManagement: false,
+      advertisementManagement: false,
+      videoManagement: false,
+      breakingNewsManagement: false,
+      seoManagement: false,
+      userManagement: false,
+      homepageManagement: false,
+      socialMediaManagement: false,
+    },
     bio: 'Community Engagement Manager and Lead Comments Moderator.'
   }
 ];
@@ -271,10 +364,14 @@ export const initialSettings: WebsiteSettings = {
   logoUrl: '',
   footerText: '© FAST COVERAGES – GLOBAL NEWS NETWORK. ALL RIGHTS RESERVED.',
   primaryColor: 'red',
-  facebookUrl: 'https://facebook.com',
-  twitterUrl: 'https://twitter.com',
-  instagramUrl: 'https://instagram.com',
-  youtubeUrl: 'https://youtube.com',
+  facebookUrl: 'https://facebook.com/fastcoverages',
+  twitterUrl: 'https://x.com/fastcoverages',
+  instagramUrl: 'https://instagram.com/fastcoverages',
+  youtubeUrl: 'https://youtube.com/@fastcoverages',
+  telegramUrl: 'https://t.me/fastcoverages',
+  linkedinUrl: 'https://linkedin.com/company/fastcoverages',
+  whatsappUrl: '+1 (212) 555-0199',
+  websiteUrl: 'https://fastcoverages.com',
   rssEnabled: true,
   twoFactorEnabled: true,
   contactPhone: '+1 (212) 555-0199',
@@ -282,6 +379,26 @@ export const initialSettings: WebsiteSettings = {
   officeAddressNY: 'Times Square News Tower, Floor 44, New York, NY 10036',
   officeAddressLondon: 'Reuters Way, Westminster Hub, London EC4Y 0DY',
   officeAddressDelhi: 'Connaught Space Chambers, Sector 4, New Delhi 110001',
+
+  mobileNumbers: [
+    { id: 'mob-1', label: 'Main Newsroom Helpline', number: '+1 (212) 555-0199', active: true },
+    { id: 'mob-2', label: 'Global Emergency Desk', number: '+1 (212) 555-0188', active: true }
+  ],
+  whatsappNumbers: [
+    { id: 'wa-1', label: 'WhatsApp News Tips Line', number: '+12125550199', active: true }
+  ],
+  emailAddresses: [
+    { id: 'em-1', label: 'Editorial Desk', email: 'editorial@fastcoverages.com', active: true },
+    { id: 'em-2', label: 'Press & Media Inquiries', email: 'press@fastcoverages.com', active: true }
+  ],
+  officeAddresses: [
+    { id: 'off-1', label: 'New York Headquarters', address: 'Times Square News Tower, Floor 44, New York, NY 10036', mapUrl: 'https://maps.google.com/?q=Times+Square+New+York', active: true },
+    { id: 'off-2', label: 'London Bureau', address: 'Reuters Way, Westminster Hub, London EC4Y 0DY', mapUrl: 'https://maps.google.com/?q=Westminster+London', active: true },
+    { id: 'off-3', label: 'New Delhi Hub', address: 'Connaught Space Chambers, Sector 4, New Delhi 110001', mapUrl: 'https://maps.google.com/?q=Connaught+Place+New+Delhi', active: true }
+  ],
+  googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.2157071641013!2d-73.9878441!3d40.7579747!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1680000000000!5m2!1sen!2sus',
+  googleMapsLocationUrl: 'https://maps.google.com/?q=Times+Square+New+York',
+
   chartPosition: 'Side',
   cryptoMarketEnabled: true,
   forexMarketEnabled: true,

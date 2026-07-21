@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Mail, MapPin, Send, Briefcase, Award, CheckCircle2, 
   Play, Users, Heart, Eye, Megaphone, ShieldCheck, 
-  HelpCircle, Sparkles, Video, Image, ExternalLink
+  HelpCircle, Sparkles, Video, Image, ExternalLink, Phone, MessageCircle, Globe, Facebook, Twitter, Instagram, Youtube, Share2, Map
 } from 'lucide-react';
 import { Article, CareerListing, User, WebsiteSettings, AdSlot } from '../types';
 
@@ -128,94 +128,277 @@ function ContactUs({ settings }: { settings: WebsiteSettings }) {
     setTimeout(() => setSent(false), 5000);
   };
 
+  const activeMobileNumbers = (settings.mobileNumbers || []).filter(item => item.active !== false);
+  const activeWhatsappNumbers = (settings.whatsappNumbers || []).filter(item => item.active !== false);
+  const activeEmailAddresses = (settings.emailAddresses || []).filter(item => item.active !== false);
+  const activeOfficeAddresses = (settings.officeAddresses || []).filter(item => item.active !== false);
+
+  const hasSocials = Boolean(
+    settings.facebookUrl || settings.twitterUrl || settings.instagramUrl || 
+    settings.youtubeUrl || settings.telegramUrl || settings.linkedinUrl || settings.websiteUrl
+  );
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-      <div className="lg:col-span-2 bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-6 md:p-8 rounded-lg shadow-sm">
-        <h2 className="text-xs font-black uppercase text-editorial-accent tracking-[0.25em] font-mono mb-2">Editorial Desk</h2>
-        <h1 className="text-xl md:text-3xl font-black text-slate-950 dark:text-editorial-text leading-tight mb-4">Submit Tips & Feedback</h1>
-        <p className="text-xs text-slate-500 dark:text-editorial-text/60 leading-relaxed mb-6">
-          Do you have a secure leak, breaking bulletin tip, or general feedback about our articles? Fill out the encrypted registry below. All files are reviewed under Strict Journalist Privilege protocols.
-        </p>
+      <div className="lg:col-span-2 bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-6 md:p-8 rounded-lg shadow-sm flex flex-col gap-6">
+        <div>
+          <h2 className="text-xs font-black uppercase text-editorial-accent tracking-[0.25em] font-mono mb-2">Editorial Desk</h2>
+          <h1 className="text-xl md:text-3xl font-black text-slate-950 dark:text-editorial-text leading-tight mb-3">Submit Tips & Direct Inquiries</h1>
+          <p className="text-xs text-slate-500 dark:text-editorial-text/60 leading-relaxed font-serif">
+            Do you have a secure leak, breaking bulletin tip, or general feedback about our global coverages? Fill out the encrypted registry below. All submissions are processed under Strict Journalist Privilege protocols.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Your Identity / Alias *</label>
+              <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Your Name / Alias *</label>
               <input type="text" required placeholder="John Doe or Anonymous" className="bg-slate-50 dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-3 rounded outline-none focus:border-editorial-accent dark:text-editorial-text" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Secure Email Address *</label>
-              <input type="email" required placeholder="alias@protonmail.com" className="bg-slate-50 dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-3 rounded outline-none focus:border-editorial-accent dark:text-editorial-text" />
+              <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Contact Email *</label>
+              <input type="email" required placeholder="alias@domain.com" className="bg-slate-50 dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-3 rounded outline-none focus:border-editorial-accent dark:text-editorial-text" />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Inquiry Category *</label>
             <select className="bg-slate-50 dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-3 rounded outline-none focus:border-editorial-accent dark:text-editorial-text">
-              <option>Breaking News Leak (Anonymous)</option>
-              <option>Editorial Review Challenge</option>
-              <option>Technical/Cloud Server Inquiry</option>
+              <option>Breaking News Tip (Anonymous)</option>
+              <option>Editorial Correction Request</option>
+              <option>Commercial / Ad Partnership</option>
               <option>General Press Bulletin</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Secure Message Body *</label>
-            <textarea rows={6} required placeholder="Describe the story, include dates, coordinates, or verified sources..." className="bg-slate-50 dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-3 rounded outline-none focus:border-editorial-accent dark:text-editorial-text" />
+            <label className="text-[10px] font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono">Message / Details *</label>
+            <textarea rows={5} required placeholder="Provide details, dates, locations or verified references..." className="bg-slate-50 dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-3 rounded outline-none focus:border-editorial-accent dark:text-editorial-text" />
           </div>
 
           <button type="submit" className="bg-editorial-accent hover:bg-red-700 text-white font-black py-3 px-6 rounded text-xs uppercase tracking-widest transition flex items-center justify-center gap-2 cursor-pointer font-mono">
-            <Send className="w-4 h-4" /> Send Secure Transmission
+            <Send className="w-4 h-4" /> Send Transmission
           </button>
 
           {sent && (
             <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/30 text-emerald-600 dark:text-emerald-400 rounded text-xs flex items-center gap-2 font-mono">
               <CheckCircle2 className="w-4.5 h-4.5 shrink-0" />
-              <span>Tip logged dynamically! Vetted in our administrative security workspace.</span>
+              <span>Transmission sent successfully! Logged in our newsroom desk.</span>
             </div>
           )}
         </form>
+
+        {/* Embedded Google Map if present */}
+        {settings.googleMapsEmbedUrl && (
+          <div className="border-t border-slate-100 dark:border-white/10 pt-5 flex flex-col gap-2">
+            <h3 className="text-xs font-black uppercase text-slate-900 dark:text-editorial-text font-mono flex items-center gap-2">
+              <Map className="w-4 h-4 text-editorial-accent" />
+              <span>Interactive Map Location</span>
+            </h3>
+            <div className="w-full h-64 rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-editorial-bg">
+              <iframe
+                src={settings.googleMapsEmbedUrl}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Google Maps Location"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-6">
+        {/* Contact Numbers & Emails */}
         <div className="bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-5 rounded-lg shadow-sm flex flex-col gap-4">
-          <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-editorial-accent tracking-[0.2em] font-mono">Global Offices</h3>
-          <div className="flex flex-col gap-4 text-xs">
-            <div className="flex gap-3">
-              <MapPin className="w-5 h-5 text-editorial-accent shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 dark:text-editorial-text">New York Headquarters</p>
-                <p className="text-slate-400 mt-0.5 leading-relaxed">{settings.officeAddressNY || "Times Square News Tower, Floor 44, New York, NY 10036"}</p>
+          <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-editorial-accent tracking-[0.2em] font-mono">Contact Information</h3>
+
+          {/* Phone Numbers */}
+          {(activeMobileNumbers.length > 0 || settings.contactPhone) && (
+            <div className="flex flex-col gap-2">
+              <div className="text-[11px] font-bold uppercase text-slate-400 dark:text-editorial-text/40 font-mono flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-editorial-accent" />
+                <span>Phone / Hotline Numbers</span>
+              </div>
+              <div className="flex flex-col gap-1.5 pl-5">
+                {activeMobileNumbers.length > 0 ? (
+                  activeMobileNumbers.map((p) => (
+                    <a key={p.id} href={`tel:${p.number}`} className="text-xs font-mono font-bold text-slate-800 dark:text-editorial-text hover:text-editorial-accent transition flex justify-between items-center bg-slate-50 dark:bg-editorial-bg/60 p-2 rounded border border-slate-100 dark:border-white/5">
+                      <span>{p.label}: {p.number}</span>
+                      <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+                    </a>
+                  ))
+                ) : (
+                  <a href={`tel:${settings.contactPhone}`} className="text-xs font-mono font-bold text-slate-800 dark:text-editorial-text hover:text-editorial-accent transition bg-slate-50 dark:bg-editorial-bg/60 p-2 rounded border border-slate-100 dark:border-white/5">
+                    {settings.contactPhone}
+                  </a>
+                )}
               </div>
             </div>
-            <div className="flex gap-3 border-t border-slate-100 dark:border-white/5 pt-3">
-              <MapPin className="w-5 h-5 text-editorial-accent shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 dark:text-editorial-text">London Bureau</p>
-                <p className="text-slate-400 mt-0.5 leading-relaxed">{settings.officeAddressLondon || "Reuters Way, Westminster Hub, London EC4Y 0DY"}</p>
+          )}
+
+          {/* WhatsApp Lines */}
+          {activeWhatsappNumbers.length > 0 && (
+            <div className="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+              <div className="text-[11px] font-bold uppercase text-slate-400 dark:text-editorial-text/40 font-mono flex items-center gap-1.5">
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
+                <span>WhatsApp Lines</span>
+              </div>
+              <div className="flex flex-col gap-1.5 pl-5">
+                {activeWhatsappNumbers.map((w) => (
+                  <a key={w.id} href={`https://wa.me/${w.number.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 hover:underline transition flex justify-between items-center bg-emerald-50/50 dark:bg-emerald-950/20 p-2 rounded border border-emerald-100 dark:border-emerald-900/30">
+                    <span>{w.label}: {w.number}</span>
+                    <ExternalLink className="w-3 h-3 text-emerald-500 shrink-0" />
+                  </a>
+                ))}
               </div>
             </div>
-            <div className="flex gap-3 border-t border-slate-100 dark:border-white/5 pt-3">
-              <MapPin className="w-5 h-5 text-editorial-accent shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 dark:text-editorial-text">New Delhi Hub</p>
-                <p className="text-slate-400 mt-0.5 leading-relaxed">{settings.officeAddressDelhi || "Connaught Space Chambers, Sector 4, New Delhi 110001"}</p>
+          )}
+
+          {/* Emails */}
+          {(activeEmailAddresses.length > 0 || settings.contactEmail) && (
+            <div className="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+              <div className="text-[11px] font-bold uppercase text-slate-400 dark:text-editorial-text/40 font-mono flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-editorial-accent" />
+                <span>Email Desks</span>
+              </div>
+              <div className="flex flex-col gap-1.5 pl-5">
+                {activeEmailAddresses.length > 0 ? (
+                  activeEmailAddresses.map((m) => (
+                    <a key={m.id} href={`mailto:${m.email}`} className="text-xs font-mono font-bold text-slate-800 dark:text-editorial-text hover:text-editorial-accent transition flex justify-between items-center bg-slate-50 dark:bg-editorial-bg/60 p-2 rounded border border-slate-100 dark:border-white/5">
+                      <span>{m.label}: {m.email}</span>
+                      <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+                    </a>
+                  ))
+                ) : (
+                  <a href={`mailto:${settings.contactEmail}`} className="text-xs font-mono font-bold text-slate-800 dark:text-editorial-text hover:text-editorial-accent transition bg-slate-50 dark:bg-editorial-bg/60 p-2 rounded border border-slate-100 dark:border-white/5">
+                    {settings.contactEmail}
+                  </a>
+                )}
               </div>
             </div>
-            <div className="flex gap-3 border-t border-slate-100 dark:border-white/5 pt-3">
-              <Mail className="w-5 h-5 text-editorial-accent shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 dark:text-editorial-text">Secure Email Directory</p>
-                <p className="text-slate-400 mt-0.5 leading-relaxed text-editorial-accent font-mono">{settings.contactEmail || "editorial@fastcoverages.com"}</p>
-              </div>
-            </div>
-            <div className="flex gap-3 border-t border-slate-100 dark:border-white/5 pt-3">
-              <Mail className="w-5 h-5 opacity-0 shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 dark:text-editorial-text">Telephone Desk</p>
-                <p className="text-slate-400 mt-0.5 leading-relaxed font-mono">{settings.contactPhone || "+1 (212) 555-0199"}</p>
-              </div>
+          )}
+        </div>
+
+        {/* Global Offices */}
+        {(activeOfficeAddresses.length > 0 || settings.officeAddressNY || settings.officeAddressLondon || settings.officeAddressDelhi || settings.officeAddress) && (
+          <div className="bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-5 rounded-lg shadow-sm flex flex-col gap-4">
+            <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-editorial-accent tracking-[0.2em] font-mono">Office Locations</h3>
+            <div className="flex flex-col gap-3 text-xs">
+              {activeOfficeAddresses.length > 0 ? (
+                activeOfficeAddresses.map((o) => (
+                  <div key={o.id} className="flex gap-3 pb-3 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
+                    <MapPin className="w-4 h-4 text-editorial-accent shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-slate-900 dark:text-editorial-text">{o.title || o.label}</p>
+                      <p className="text-slate-500 dark:text-editorial-text/60 mt-0.5 leading-relaxed">{o.address}</p>
+                      {(o.googleMapsUrl || o.mapUrl) && (
+                        <a href={o.googleMapsUrl || o.mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] text-editorial-accent font-semibold mt-1 hover:underline">
+                          <span>View on Google Maps</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <>
+                  {settings.officeAddressNY && (
+                    <div className="flex gap-3">
+                      <MapPin className="w-4 h-4 text-editorial-accent shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-editorial-text">New York Headquarters</p>
+                        <p className="text-slate-500 dark:text-editorial-text/60 mt-0.5 leading-relaxed">{settings.officeAddressNY}</p>
+                      </div>
+                    </div>
+                  )}
+                  {settings.officeAddressLondon && (
+                    <div className="flex gap-3 border-t border-slate-100 dark:border-white/5 pt-3">
+                      <MapPin className="w-4 h-4 text-editorial-accent shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-editorial-text">London Bureau</p>
+                        <p className="text-slate-500 dark:text-editorial-text/60 mt-0.5 leading-relaxed">{settings.officeAddressLondon}</p>
+                      </div>
+                    </div>
+                  )}
+                  {settings.officeAddressDelhi && (
+                    <div className="flex gap-3 border-t border-slate-100 dark:border-white/5 pt-3">
+                      <MapPin className="w-4 h-4 text-editorial-accent shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-editorial-text">New Delhi Hub</p>
+                        <p className="text-slate-500 dark:text-editorial-text/60 mt-0.5 leading-relaxed">{settings.officeAddressDelhi}</p>
+                      </div>
+                    </div>
+                  )}
+                  {!settings.officeAddressNY && !settings.officeAddressLondon && !settings.officeAddressDelhi && settings.officeAddress && (
+                    <div className="flex gap-3">
+                      <MapPin className="w-4 h-4 text-editorial-accent shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-editorial-text">Head Office</p>
+                        <p className="text-slate-500 dark:text-editorial-text/60 mt-0.5 leading-relaxed">{settings.officeAddress}</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Social Networks */}
+        {hasSocials && (
+          <div className="bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-5 rounded-lg shadow-sm flex flex-col gap-3">
+            <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-editorial-accent tracking-[0.2em] font-mono flex items-center gap-1.5">
+              <Share2 className="w-3.5 h-3.5 text-editorial-accent" />
+              <span>Connect On Socials</span>
+            </h3>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              {settings.facebookUrl && (
+                <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Facebook className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span className="truncate">Facebook</span>
+                </a>
+              )}
+              {settings.twitterUrl && (
+                <a href={settings.twitterUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Twitter className="w-4 h-4 text-sky-500 shrink-0" />
+                  <span className="truncate">Twitter (X)</span>
+                </a>
+              )}
+              {settings.instagramUrl && (
+                <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Instagram className="w-4 h-4 text-pink-600 shrink-0" />
+                  <span className="truncate">Instagram</span>
+                </a>
+              )}
+              {settings.youtubeUrl && (
+                <a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Youtube className="w-4 h-4 text-red-600 shrink-0" />
+                  <span className="truncate">YouTube</span>
+                </a>
+              )}
+              {settings.telegramUrl && (
+                <a href={settings.telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Send className="w-4 h-4 text-sky-400 shrink-0" />
+                  <span className="truncate">Telegram</span>
+                </a>
+              )}
+              {settings.linkedinUrl && (
+                <a href={settings.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Globe className="w-4 h-4 text-blue-700 shrink-0" />
+                  <span className="truncate">LinkedIn</span>
+                </a>
+              )}
+              {settings.websiteUrl && (
+                <a href={settings.websiteUrl} target="_blank" rel="noopener noreferrer" className="col-span-2 flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-editorial-bg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-editorial-text font-medium transition">
+                  <Globe className="w-4 h-4 text-editorial-accent shrink-0" />
+                  <span className="truncate">Official Website ({settings.websiteUrl})</span>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

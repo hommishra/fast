@@ -90,13 +90,7 @@ export default function Navigation({
         </div>
 
         <div className="flex items-center gap-4">
-          <button 
-            onClick={onOpenAdmin}
-            className="flex items-center gap-1 hover:text-editorial-accent text-editorial-accent font-black tracking-wider uppercase transition cursor-pointer"
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>Admin Control Center</span>
-          </button>
+          {/* Top header clean micro bar right side */}
         </div>
       </div>
 
@@ -110,17 +104,37 @@ export default function Navigation({
           {mobileMenuOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
         </button>
 
-        {/* Brand Headline Logo */}
+        {/* Brand Headline Logo with Premium Animated FC Emblem */}
         <button 
           onClick={() => onNavigate('home')}
-          className="flex flex-col items-start text-left shrink-0 cursor-pointer focus:outline-none"
+          className="flex items-center gap-3 shrink-0 cursor-pointer focus:outline-none group select-none"
         >
-          <span className="text-xl md:text-3xl font-black uppercase tracking-tighter text-slate-950 dark:text-white leading-none">
-            FAST <span className="text-editorial-accent">COVERAGES</span>
-          </span>
-          <span className="text-[9px] md:text-[10px] text-slate-400 dark:text-editorial-text/40 uppercase tracking-[0.4em] font-bold font-mono">
-            {settings.tagline || "GLOBAL NEWS NETWORK"}
-          </span>
+          {/* Animated Logo Container */}
+          <div className="relative w-11 h-11 md:w-13 md:h-13 flex items-center justify-center shrink-0">
+            {/* Continuously Rotating Slow Ring (360deg every 20s) */}
+            <div className="absolute inset-0 rounded-full border-2 border-dashed border-editorial-accent/90 animate-spin-slow pointer-events-none" />
+            
+            {/* Outer Red Pulse Glow Effect */}
+            <div className="absolute inset-0 rounded-full animate-red-pulse pointer-events-none opacity-80" />
+
+            {/* FC Logo Image */}
+            <img 
+              src="/fast_coverages_logo.jpg" 
+              alt="FAST COVERAGES - GLOBAL NEWS NETWORK Logo" 
+              loading="eager"
+              className="relative z-10 w-9 h-9 md:w-11 md:h-11 rounded-full object-cover border border-editorial-accent/50 shadow-lg group-hover:scale-110 active:scale-95 transition-transform duration-300"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          <div className="flex flex-col items-start text-left">
+            <span className="text-xl md:text-3xl font-black uppercase tracking-tighter text-slate-950 dark:text-white leading-none group-hover:text-editorial-accent transition-colors">
+              FAST <span className="text-editorial-accent">COVERAGES</span>
+            </span>
+            <span className="text-[9px] md:text-[10px] text-slate-500 dark:text-editorial-text/50 uppercase tracking-[0.35em] font-bold font-mono mt-0.5">
+              {settings.tagline || "GLOBAL NEWS NETWORK"}
+            </span>
+          </div>
         </button>
 
         {/* Real-time Search Box */}

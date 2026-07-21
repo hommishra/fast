@@ -1,13 +1,32 @@
-export type UserRole = 'Super Admin' | 'Admin' | 'Editor' | 'Journalist' | 'Moderator';
+export type UserRole = 'Website Owner' | 'Super Admin' | 'Admin' | 'Editor' | 'Journalist' | 'Moderator' | 'News Reporter';
+
+export interface UserPermissions {
+  fullWebsiteControl: boolean;
+  partialWebsiteControl: boolean;
+  articleManagement: boolean;
+  advertisementManagement: boolean;
+  videoManagement: boolean;
+  breakingNewsManagement: boolean;
+  seoManagement: boolean;
+  userManagement: boolean;
+  homepageManagement: boolean;
+  socialMediaManagement: boolean;
+}
 
 export interface User {
   id: string;
   name: string;
   email: string;
+  phone?: string;
+  mobile?: string;
   role: UserRole;
+  designation?: string;
   avatar: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Suspended';
+  permissions: UserPermissions;
   bio?: string;
+  password?: string;
+  lastActive?: string;
 }
 
 export interface Category {
@@ -51,13 +70,56 @@ export interface Comment {
   isApproved: boolean;
 }
 
+export type AdSlotType = 
+  | 'Header' 
+  | 'Sidebar' 
+  | 'Footer' 
+  | 'Sticky' 
+  | 'Mobile' 
+  | 'In-Article' 
+  | 'Between-Articles' 
+  | 'Homepage' 
+  | 'Breaking-News-Section' 
+  | 'Video-Ad' 
+  | 'Popup';
+
+export type AdFormatType = 'Google AdSense' | 'Banner' | 'Native' | 'Custom HTML' | 'Video Ad' | 'Image Ad';
+
 export interface AdSlot {
   id: string;
-  type: 'Header' | 'Sidebar' | 'Footer' | 'Sticky' | 'Mobile' | 'In-Article' | 'Popup';
+  type: AdSlotType;
   label: string;
   code?: string;
   imageUrl?: string;
   targetUrl?: string;
+  active: boolean;
+  paragraphPosition?: number; // Decides which paragraph to show inside (e.g. 1, 2, 3...)
+  adSize?: string; // e.g. '728x90', '300x250', 'Fluid', 'Video'
+  category?: string;
+  adType?: AdFormatType;
+}
+
+export interface PhoneContact {
+  id: string;
+  label: string;
+  number: string;
+  active: boolean;
+}
+
+export interface EmailContact {
+  id: string;
+  label: string;
+  email: string;
+  active: boolean;
+}
+
+export interface OfficeAddressItem {
+  id: string;
+  label: string;
+  title?: string;
+  address: string;
+  mapUrl?: string;
+  googleMapsUrl?: string;
   active: boolean;
 }
 
@@ -71,13 +133,31 @@ export interface WebsiteSettings {
   twitterUrl: string;
   instagramUrl: string;
   youtubeUrl: string;
+  telegramUrl?: string;
+  linkedinUrl?: string;
+  whatsappUrl?: string;
+  websiteUrl?: string;
   rssEnabled: boolean;
   twoFactorEnabled: boolean;
   contactPhone?: string;
   contactEmail?: string;
+  officeAddress?: string;
   officeAddressNY?: string;
   officeAddressLondon?: string;
   officeAddressDelhi?: string;
+
+  // Dynamic Contact Lists
+  mobileNumbers?: PhoneContact[];
+  whatsappNumbers?: PhoneContact[];
+  emailAddresses?: EmailContact[];
+  officeAddresses?: OfficeAddressItem[];
+  googleMapsEmbedUrl?: string;
+  googleMapsLocationUrl?: string;
+
+  // Breaking News Ticker Speed Options
+  tickerSpeed?: 'slow' | 'medium' | 'fast' | 'custom';
+  tickerSpeedSeconds?: number; // Duration or scroll speed multiplier
+
   // Live Markets Options
   chartPosition?: 'Side' | 'Bottom' | 'Top';
   cryptoMarketEnabled?: boolean;
@@ -131,6 +211,25 @@ export interface VideoItem {
   publishDate: string;
   category: string;
   author: string;
+  fileSize?: string; // Up to 5 GB support
+  format?: 'MP4' | 'MOV' | 'AVI' | 'WEBM' | 'MKV';
+  isLiveRecording?: boolean;
+}
+
+export interface LiveStreamSession {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  isLive: boolean;
+  startedAt?: string;
+  endedAt?: string;
+  streamUrl?: string;
+  recordedVideoUrl?: string;
+  thumbnailUrl?: string;
+  views: number;
+  author: string;
+  scheduledTime?: string;
 }
 
 export interface ParentSection {
@@ -139,5 +238,6 @@ export interface ParentSection {
   slug: string;
   active: boolean;
 }
+
 
 

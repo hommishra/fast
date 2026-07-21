@@ -1,12 +1,13 @@
-import { BreakingNewsItem } from '../types';
+import { BreakingNewsItem, WebsiteSettings } from '../types';
 import { Radio, ChevronRight } from 'lucide-react';
 
 interface NewsTickerProps {
   breakingNews: BreakingNewsItem[];
+  settings?: WebsiteSettings;
   onSelectHeadline?: (item: BreakingNewsItem) => void;
 }
 
-export default function NewsTicker({ breakingNews, onSelectHeadline }: NewsTickerProps) {
+export default function NewsTicker({ breakingNews, settings, onSelectHeadline }: NewsTickerProps) {
   const activeItems = breakingNews.filter(item => item.active);
 
   if (activeItems.length === 0) return null;
@@ -17,6 +18,15 @@ export default function NewsTicker({ breakingNews, onSelectHeadline }: NewsTicke
     if (!a.isPinned && b.isPinned) return 1;
     return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
   });
+
+  // Calculate dynamic speed based on settings
+  let animationDuration = '25s'; // default medium
+  if (settings?.tickerSpeed === 'slow') animationDuration = '45s';
+  else if (settings?.tickerSpeed === 'medium') animationDuration = '25s';
+  else if (settings?.tickerSpeed === 'fast') animationDuration = '12s';
+  else if (settings?.tickerSpeed === 'custom' && settings?.tickerSpeedSeconds) {
+    animationDuration = `${settings.tickerSpeedSeconds}s`;
+  }
 
   return (
     <div id="breaking-ticker-bar" className="w-full bg-[#E10600] text-white flex items-stretch border-y border-red-700 font-sans shadow-md selection:bg-black shrink-0 relative z-20">
@@ -33,7 +43,10 @@ export default function NewsTicker({ breakingNews, onSelectHeadline }: NewsTicke
 
       {/* Marquee slider container */}
       <div className="flex-1 overflow-hidden relative flex items-center bg-red-600/10">
-        <div className="flex whitespace-nowrap animate-marquee items-center py-2 h-full gap-16 hover:[animation-play-state:paused] cursor-pointer">
+        <div 
+          className="flex whitespace-nowrap animate-marquee items-center py-2 h-full gap-16 hover:[animation-play-state:paused] cursor-pointer"
+          style={{ animationDuration: animationDuration }}
+        >
           {sortedItems.map((item) => (
             <button
               key={item.id}
@@ -80,4 +93,5 @@ export default function NewsTicker({ breakingNews, onSelectHeadline }: NewsTicke
     </div>
   );
 }
+
 

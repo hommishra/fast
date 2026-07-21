@@ -16,6 +16,7 @@ import AdBanner from './components/AdBanner';
 import AdminPanel from './components/AdminPanel';
 import Footer from './components/Footer';
 import SpecialPages from './components/SpecialPages';
+import ArticleDetail from './components/ArticleDetail';
 
 // Icons
 import { 
@@ -25,7 +26,18 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const lastAnim = localStorage.getItem('fc_last_animation_time');
+    if (lastAnim) {
+      const elapsed = Date.now() - parseInt(lastAnim, 10);
+      // Automatically skip animation if user revisited within 30 minutes
+      if (elapsed < 30 * 60 * 1000) {
+        return false;
+      }
+    }
+    return true;
+  });
   const [currentPage, setCurrentPage] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -156,6 +168,37 @@ export default function App() {
       eventSource.close();
     };
   }, []);
+
+  // Route listener for /admin/login
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname === '/admin/login' || window.location.pathname.startsWith('/admin')) {
+        setIsAdminOpen(true);
+      }
+    }
+  }, []);
+
+  const handleOpenAdmin = () => {
+    setIsAdminOpen(true);
+    if (typeof window !== 'undefined' && window.location.pathname !== '/admin/login') {
+      window.history.pushState({ admin: true }, '', '/admin/login');
+    }
+  };
+  useEffect(() => {
+    if (articles.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const articleParam = params.get('article');
+    if (articleParam) {
+      const target = articles.find(a => 
+        a.id === articleParam || 
+        a.id.toLowerCase() === articleParam.toLowerCase() ||
+        a.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') === articleParam.toLowerCase()
+      );
+      if (target) {
+        setSelectedArticle(target);
+      }
+    }
+  }, [articles]);
 
   // Sync back state modifications instantly to server
   const syncWithServer = (
@@ -320,11 +363,25 @@ export default function App() {
   // Open & Track article views
   const handleViewArticle = (article: Article) => {
     setSelectedArticle(article);
+    if (typeof window !== 'undefined') {
+      const newUrl = `${window.location.pathname}?article=${encodeURIComponent(article.id)}`;
+      window.history.pushState({ articleId: article.id }, '', newUrl);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     const updated = articles.map(a => 
       a.id === article.id ? { ...a, views: a.views + 1 } : a
     );
     setArticles(updated);
     handleUpdateArticles(updated);
+  };
+
+  // Clear selected article and reset URL
+  const handleBackToNewsDesk = () => {
+    setSelectedArticle(null);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', window.location.pathname);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // Render Opening Animation
@@ -389,7 +446,7 @@ export default function App() {
         onSearch={setSearchQuery}
         isDarkMode={isDarkMode}
         onToggleDarkMode={handleToggleDarkMode}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={handleOpenAdmin}
       />
 
       {/* 3. Scrolling Breaking Headlines Ticker */}
@@ -415,208 +472,35 @@ export default function App() {
         
         {selectedArticle ? (
           /* ================== DETAILED ARTICLE READING ROOM ================== */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-            <div className="lg:col-span-2 bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-6 md:p-8 rounded-lg shadow-sm flex flex-col gap-5">
-              
-              <button 
-                onClick={() => setSelectedArticle(null)}
-                className="text-xs font-black uppercase text-editorial-accent hover:text-red-700 flex items-center gap-1 transition self-start font-mono"
-              >
-                &larr; Back to News Desk
-              </button>
-
-              <div className="flex flex-col gap-2">
-                <span className="text-xs font-black uppercase bg-editorial-accent/10 dark:bg-editorial-accent/15 text-editorial-accent px-3 py-1 rounded w-fit tracking-wider font-mono">
-                  {selectedArticle.category}
-                </span>
-                <h1 className="text-2xl md:text-4xl font-black tracking-tight text-slate-950 dark:text-editorial-text leading-tight">
-                  {selectedArticle.title}
-                </h1>
-                {selectedArticle.subtitle && (
-                  <p className="text-base md:text-lg text-slate-500 dark:text-editorial-text/60 font-medium leading-relaxed">
-                    {selectedArticle.subtitle}
-                  </p>
-                )}
-              </div>
-
-              {/* Author & Timestamp metadata line */}
-              <div className="flex items-center gap-3 border-y border-slate-200 dark:border-white/10 py-3 text-xs text-slate-500 dark:text-editorial-text/60">
-                <img 
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100" 
-                  className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 shrink-0" 
-                  alt={selectedArticle.author} 
-                />
-                <div>
-                  <p className="font-bold text-slate-850 dark:text-editorial-text">{selectedArticle.author}</p>
-                  <p className="text-[10px] uppercase font-mono tracking-wider font-bold text-slate-400 dark:text-editorial-text/40">{selectedArticle.authorRole} • {new Date(selectedArticle.publishDate).toUTCString()}</p>
-                </div>
-              </div>
-
-              {selectedArticle.image && (
-                <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-white/5">
-                  <img 
-                    src={selectedArticle.image} 
-                    alt={selectedArticle.title}
-                    className="w-full h-auto max-h-[450px] object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              )}
-
-              {/* Dynamic Content rendered nicely */}
-              <div className="text-sm md:text-base text-slate-850 dark:text-editorial-text/90 leading-relaxed space-y-4 whitespace-pre-line font-serif">
-                {selectedArticle.content}
-              </div>
-
-              {/* Photo Media Gallery Block */}
-              {selectedArticle.images && selectedArticle.images.length > 0 && (
-                <div className="border-t border-slate-100 dark:border-white/5 pt-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-editorial-text/40 mb-3 font-mono">
-                    Coverage Gallery ({selectedArticle.images.length} Photos)
-                  </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {selectedArticle.images.map((imgUrl, idx) => (
-                      <div 
-                        key={idx} 
-                        className="relative aspect-[4/3] rounded overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-900 group shadow-sm hover:shadow transition-shadow"
-                      >
-                        <img 
-                          src={imgUrl} 
-                          alt={`Report slide ${idx + 1}`} 
-                          className="w-full h-full object-cover hover:scale-[1.02] transition duration-300 cursor-zoom-in"
-                          referrerPolicy="no-referrer"
-                          onClick={() => window.open(imgUrl, '_blank')}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Quick Actions Bar */}
-              <div className="flex items-center gap-6 border-t border-slate-200 dark:border-white/10 pt-4 text-xs font-semibold text-slate-500">
-                <button 
-                  onClick={() => handleLikeArticle(selectedArticle.id)}
-                  className="flex items-center gap-1.5 hover:text-editorial-accent transition cursor-pointer font-mono"
-                >
-                  <Heart className="w-5 h-5 text-editorial-accent fill-current" />
-                  <span>{selectedArticle.likes} Likes</span>
-                </button>
-                <div className="flex items-center gap-1.5 font-mono">
-                  <Eye className="w-5 h-5 text-slate-400" />
-                  <span>{selectedArticle.views} Views</span>
-                </div>
-              </div>
-
-              {/* Comment Thread */}
-              <div className="border-t border-slate-200 dark:border-white/10 pt-6 flex flex-col gap-6">
-                <h3 className="text-lg font-black uppercase tracking-tight text-slate-950 dark:text-editorial-text">Visitor Comments</h3>
-                
-                {/* Submit comment form */}
-                <form onSubmit={handleAddComment} className="flex flex-col gap-3 p-4 bg-[#fcfbf9] dark:bg-editorial-dark border border-slate-200 dark:border-white/5 rounded-lg">
-                  <span className="text-xs font-black uppercase text-slate-400 dark:text-editorial-text/40 font-mono tracking-wider">Join the debate</span>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      required
-                      value={commentName}
-                      onChange={e => setCommentName(e.target.value)}
-                      placeholder="Your Name *"
-                      className="bg-white dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-2.5 rounded outline-none focus:border-editorial-accent dark:text-editorial-text"
-                    />
-                    <input
-                      type="email"
-                      required
-                      value={commentEmail}
-                      onChange={e => setCommentEmail(e.target.value)}
-                      placeholder="Email (private) *"
-                      className="bg-white dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-2.5 rounded outline-none focus:border-editorial-accent dark:text-editorial-text"
-                    />
-                  </div>
-
-                  <textarea
-                    rows={3}
-                    required
-                    value={commentBody}
-                    onChange={e => setCommentBody(e.target.value)}
-                    placeholder="Write constructive comment..."
-                    className="bg-white dark:bg-editorial-bg border border-slate-200 dark:border-white/10 text-xs p-2.5 rounded outline-none focus:border-editorial-accent dark:text-editorial-text"
-                  />
-
-                  <button
-                    type="submit"
-                    className="bg-editorial-accent hover:bg-red-700 text-white font-black py-2 px-4 rounded text-xs uppercase tracking-wider self-end transition flex items-center gap-1.5"
-                  >
-                    <Send className="w-3.5 h-3.5" /> Post Comment
-                  </button>
-
-                  {commentSuccess && (
-                    <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1 animate-fade-in">
-                      <CheckCircle2 className="w-4 h-4" /> Comment recorded instantly.
-                    </span>
-                  )}
-                </form>
-
-                {/* Display approved comments */}
-                <div className="flex flex-col gap-3.5">
-                  {comments.filter(c => c.articleId === selectedArticle.id).map(com => (
-                    <div key={com.id} className="p-4 bg-[#fcfbf9] dark:bg-editorial-bg border border-slate-200 dark:border-white/5 rounded">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold text-slate-850 dark:text-editorial-text">{com.authorName}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-slate-400 font-mono">{new Date(com.date).toLocaleDateString()}</span>
-                          {sessionStorage.getItem('fc_admin_session') === 'active' && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (window.confirm("PERMANENT DELETE: Are you sure you want to permanently delete this comment?")) {
-                                  const updatedComments = comments.filter(c => c.id !== com.id);
-                                  setComments(updatedComments);
-                                  syncWithServer(articles, categories, settings, adSlots, updatedComments, careers, breakingNews, markets, videos);
-                                }
-                              }}
-                              className="text-[10px] font-bold text-red-650 hover:text-red-750 font-mono hover:underline cursor-pointer"
-                              title="Purge comment permanently"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-600 dark:text-editorial-text/70 leading-relaxed font-sans">{com.content}</p>
-                    </div>
-                  ))}
-                  {comments.filter(c => c.articleId === selectedArticle.id).length === 0 && (
-                    <p className="text-xs text-slate-400">No comments posted yet. Be the first to express opinion!</p>
-                  )}
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* Sidebar with related entries and ads */}
-            <div className="flex flex-col gap-6">
-              <AdBanner slot={adSlots.find(s => s.type === 'Sidebar')} />
-              
-              <div className="bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-4 rounded-lg">
-                <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-slate-200 dark:border-white/5 mb-3 tracking-[0.25em] font-mono">Related Desks</h3>
-                <div className="flex flex-col gap-3">
-                  {articles.filter(a => a.category === selectedArticle.category && a.id !== selectedArticle.id).slice(0, 4).map(item => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleViewArticle(item)}
-                      className="text-left group flex flex-col gap-0.5 cursor-pointer"
-                    >
-                      <span className="text-xs font-bold text-slate-900 dark:text-editorial-text/95 group-hover:text-editorial-accent transition line-clamp-1">{item.title}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-editorial-text/40">{new Date(item.publishDate).toLocaleDateString()}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <ArticleDetail
+            article={selectedArticle}
+            articles={articles}
+            categories={categories}
+            adSlots={adSlots}
+            comments={comments}
+            settings={settings}
+            breakingNews={breakingNews}
+            onBack={handleBackToNewsDesk}
+            onViewArticle={handleViewArticle}
+            onAddComment={(articleId, name, email, content) => {
+              const newComment: Comment = {
+                id: `c-${Date.now()}`,
+                articleId,
+                authorName: name,
+                authorEmail: email,
+                content,
+                date: new Date().toISOString(),
+                isApproved: true
+              };
+              const updatedComments = [newComment, ...comments];
+              setComments(updatedComments);
+              const updatedArticles = articles.map(a => 
+                a.id === articleId ? { ...a, commentsCount: (a.commentsCount || 0) + 1 } : a
+              );
+              setArticles(updatedArticles);
+              syncWithServer(updatedArticles, categories, settings, adSlots, updatedComments, careers, breakingNews, markets, videos);
+            }}
+          />
         ) : currentPage === 'global-markets' ? (
           <div className="w-full">
             <GlobalMarkets 
@@ -729,10 +613,7 @@ export default function App() {
 
                       <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 pt-2 border-t border-slate-200 dark:border-white/5 mt-1">
                         <span className="font-mono text-slate-500 dark:text-editorial-text/40">By {art.author}</span>
-                        <div className="flex items-center gap-3">
-                          <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> {art.views}</span>
-                          <span className="flex items-center gap-1 text-editorial-accent"><Heart className="w-3.5 h-3.5" /> {art.likes}</span>
-                        </div>
+                        <span className="font-mono text-slate-400 dark:text-editorial-text/40">{Math.max(1, Math.ceil((art.content || '').trim().split(/\s+/).length / 200))} min read</span>
                       </div>
                     </div>
                   </div>
@@ -754,6 +635,116 @@ export default function App() {
                   </button>
                 )}
               </div>
+
+              {/* All Parent Sections Showcase on Home Page (CNN / BBC / Reuters style) */}
+              {currentPage === 'home' && (parentSections || []).filter(ps => ps.active !== false).length > 0 && (
+                <div className="flex flex-col gap-6 mt-8 pt-6 border-t-2 border-slate-900 dark:border-white/20">
+                  <div className="flex items-center justify-between border-b-2 border-editorial-accent pb-2.5">
+                    <h2 className="text-sm md:text-base font-black uppercase text-slate-950 dark:text-editorial-text tracking-[0.2em] flex items-center gap-2 font-mono">
+                      <span className="w-2.5 h-2.5 bg-editorial-accent rounded-full animate-pulse"></span>
+                      <span>ALL NETWORK PARENT DESKS & SECTIONS</span>
+                    </h2>
+                    <span className="text-xs font-mono font-bold text-slate-400">
+                      {(parentSections || []).filter(ps => ps.active !== false).length} Desks Active
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {(parentSections || []).filter(ps => ps.active !== false).map(ps => {
+                      const subCats = categories.filter(c => c.parentSectionId === ps.id);
+                      const subCatNames = subCats.map(c => c.name.toLowerCase());
+                      const psArticles = articles.filter(a => {
+                        const artCat = a.category.toLowerCase();
+                        return artCat === ps.name.toLowerCase() || subCatNames.includes(artCat);
+                      });
+
+                      return (
+                        <div 
+                          key={ps.id} 
+                          className="bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 rounded-lg p-4 flex flex-col gap-3 shadow-sm hover:border-editorial-accent/50 transition-all"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-150 dark:border-white/5 pb-2">
+                            <button 
+                              onClick={() => {
+                                setCurrentPage(ps.slug);
+                                setSelectedArticle(null);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="text-xs font-black uppercase tracking-wider text-slate-950 dark:text-white hover:text-editorial-accent transition flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>{ps.name}</span>
+                              <ChevronRight className="w-3.5 h-3.5 text-editorial-accent" />
+                            </button>
+                            <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 dark:bg-editorial-bg px-2 py-0.5 rounded border border-slate-200 dark:border-white/5">
+                              {psArticles.length} Bulletins
+                            </span>
+                          </div>
+
+                          {/* Sub-categories Pills */}
+                          {subCats.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {subCats.map(sc => (
+                                <button
+                                  key={sc.id}
+                                  onClick={() => {
+                                    setCurrentPage(sc.slug);
+                                    setSelectedArticle(null);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                  }}
+                                  className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 dark:bg-editorial-bg text-slate-600 dark:text-editorial-text/70 hover:bg-editorial-accent hover:text-white transition cursor-pointer"
+                                >
+                                  {sc.name}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Section Lead Article */}
+                          {psArticles[0] ? (
+                            <div 
+                              onClick={() => handleViewArticle(psArticles[0])}
+                              className="flex gap-3 items-center group cursor-pointer pt-1"
+                            >
+                              {psArticles[0].image && (
+                                <img 
+                                  src={psArticles[0].image} 
+                                  alt={psArticles[0].title}
+                                  className="w-20 h-14 object-cover rounded border border-slate-200 dark:border-white/10 shrink-0 group-hover:scale-105 transition-transform"
+                                  referrerPolicy="no-referrer"
+                                />
+                              )}
+                              <div className="flex flex-col gap-0.5 overflow-hidden">
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-editorial-accent transition line-clamp-2 leading-snug">
+                                  {psArticles[0].title}
+                                </h4>
+                                <span className="text-[9px] text-slate-400 font-mono">{new Date(psArticles[0].publishDate).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-[11px] text-slate-400 italic">No bulletins published under {ps.name} desk yet.</p>
+                          )}
+
+                          {/* Secondary Headlines */}
+                          {psArticles.slice(1, 3).length > 0 && (
+                            <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100 dark:border-white/5">
+                              {psArticles.slice(1, 3).map(art => (
+                                <button
+                                  key={art.id}
+                                  onClick={() => handleViewArticle(art)}
+                                  className="text-left text-xs font-medium text-slate-700 dark:text-editorial-text/80 hover:text-editorial-accent dark:hover:text-editorial-accent line-clamp-1 transition flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <span className="w-1 h-1 rounded-full bg-editorial-accent shrink-0"></span>
+                                  <span>{art.title}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
             </div>
 
@@ -781,18 +772,18 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Live updates / most read */}
+              {/* Trending Bulletins */}
               <div className="bg-white dark:bg-editorial-dark border border-slate-200/80 dark:border-white/5 p-4 rounded-lg shadow-sm">
-                <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-editorial-accent mb-3.5 tracking-[0.25em] font-mono">Most Watched</h3>
+                <h3 className="text-xs font-black uppercase text-slate-950 dark:text-editorial-text pb-2 border-b border-editorial-accent mb-3.5 tracking-[0.25em] font-mono">Trending Bulletins</h3>
                 <div className="flex flex-col gap-3">
-                  {articles.sort((a, b) => b.views - a.views).slice(0, 4).map((item) => (
+                  {articles.slice(0, 4).map((item) => (
                     <button
                       key={item.id}
                       onClick={() => handleViewArticle(item)}
                       className="text-left flex flex-col gap-0.5 cursor-pointer group"
                     >
                       <span className="text-xs font-bold text-slate-900 dark:text-editorial-text/90 group-hover:text-editorial-accent dark:group-hover:text-editorial-accent transition line-clamp-1">{item.title}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-editorial-text/40 font-mono">{item.views.toLocaleString()} viewers</span>
+                      <span className="text-[10px] text-slate-400 dark:text-editorial-text/40 font-mono">{item.category} • {new Date(item.publishDate).toLocaleDateString()}</span>
                     </button>
                   ))}
                 </div>
@@ -864,9 +855,10 @@ export default function App() {
       <Footer 
         settings={settings} 
         currentPage={currentPage}
+        onOpenAdmin={handleOpenAdmin}
         onNavigate={(page) => {
-          // Special handles for RSS or Sitemap view
-          if (page === 'rss-feed' || page === 'sitemap') {
+          // Special handles for RSS view
+          if (page === 'rss-feed') {
             alert(`Opening standard live generated XML feed: https://fastcoverages.com/${page}.xml. Perfectly optimized for indexing!`);
           } else if (page === 'careers') {
             setCurrentPage('careers');
@@ -909,7 +901,12 @@ export default function App() {
           onSaveComments={handleUpdateComments}
           onSaveUsers={handleUpdateUsers}
           onSaveParentSections={handleUpdateParentSections}
-          onClose={() => setIsAdminOpen(false)}
+          onClose={() => {
+            setIsAdminOpen(false);
+            if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
         />
       )}
 
@@ -930,6 +927,9 @@ export default function App() {
                 src={playingVideo.videoUrl} 
                 controls 
                 autoPlay 
+                controlsList="nodownload"
+                disablePictureInPicture
+                onContextMenu={(e) => e.preventDefault()}
                 className="w-full h-full"
               />
             </div>
