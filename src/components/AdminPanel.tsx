@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FCLogo from './FCLogo';
 import { Article, Category, User, AdSlot, WebsiteSettings, CareerListing, BreakingNewsItem, MarketItem, VideoItem, Comment, ParentSection } from '../types';
 import { 
   FileText, FolderPlus, Settings as SettingsIcon, Image as ImageIcon, 
@@ -1237,18 +1238,7 @@ INSERT INTO website_settings (name, tagline, footer_text, primary_color) VALUES
 
         {/* Admin Header */}
         <div className="bg-editorial-dark text-white px-6 py-4 flex items-center justify-between border-b border-white/5 shrink-0">
-          <div className="flex items-center gap-3">
-            <img 
-              src="/fast_coverages_logo.jpg" 
-              alt="Fast Coverages Logo" 
-              className="w-9 h-9 rounded-full object-cover border border-red-600/80 shadow-md"
-              referrerPolicy="no-referrer"
-            />
-            <div>
-              <h2 className="text-lg font-black tracking-tight uppercase">FAST COVERAGES</h2>
-              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono">Premium Editorial Control Center</p>
-            </div>
-          </div>
+          <FCLogo size="sm" showText={true} animatedGlobe={true} />
 
           <div className="flex items-center gap-3">
             <span className="hidden md:inline-flex items-center gap-1.5 bg-editorial-bg border border-white/5 text-slate-300 px-3 py-1 text-xs font-semibold rounded-full font-mono">

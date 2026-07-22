@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WebsiteSettings } from '../types';
+import FCLogo from './FCLogo';
 import { 
   Facebook, Twitter, Instagram, Youtube, Rss, ArrowUpRight, 
   Mail, CheckCircle2, Send, Globe, MessageCircle, Phone, 
@@ -67,21 +68,8 @@ export default function Footer({ settings, onNavigate, currentPage, onOpenAdmin,
         {/* Top bar with newsletter & Branding */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-8 border-b border-white/10">
           <div className="lg:col-span-1 flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/fast_coverages_logo.jpg" 
-                alt="FAST COVERAGES Logo" 
-                className="w-10 h-10 rounded-full object-cover border border-editorial-accent/80 shadow-md"
-                referrerPolicy="no-referrer"
-              />
-              <span className="text-xl md:text-2xl font-black uppercase tracking-tighter">
-                FAST <span className="text-editorial-accent">COVERAGES</span>
-              </span>
-            </div>
-            <p className="text-xs text-editorial-text/40 font-black tracking-[0.25em] font-mono">
-              {settings.tagline || "GLOBAL NEWS NETWORK"}
-            </p>
-            <p className="text-xs text-editorial-text/60 leading-relaxed max-w-sm">
+            <FCLogo size="sm" showText={true} animatedGlobe={true} />
+            <p className="text-xs text-editorial-text/60 leading-relaxed max-w-sm mt-1">
               The premier destination for real-time news, deep policy reports, fact-checked disclosures, and live bureaus across the World.
             </p>
           </div>
